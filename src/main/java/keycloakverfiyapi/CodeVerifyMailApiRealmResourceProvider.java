@@ -167,7 +167,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
         List<Object> subjAttr = ImmutableList.of(realmName);
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("code", code);
-        attributes.put("ttl", 3);
+        attributes.put("ttl", expireMinute);
         FreeMarkerEmailTemplateProvider mailSender = new FreeMarkerEmailTemplateProvider(session);
         mailSender.setRealm(realm);
         mailSender.setUser(user);
