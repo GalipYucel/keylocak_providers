@@ -32,7 +32,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
 
     private final KeycloakSession session;
     private static final Logger logger = Logger.getLogger(CodeVerifyMailApiRealmResourceProvider.class);
-    	private static final int expireSecond=180;
+    	private static final int expireMinute=5;
     // In-memory store for verification codes and timestamps
     private static final Map<String, VerificationData> verificationDataStore = new HashMap<>();
 
@@ -72,7 +72,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
             long currentTime = System.currentTimeMillis();
             long elapsedTime = currentTime - verificationData.getTimestamp();
 
-            if (elapsedTime > TimeUnit.MINUTES.toMillis(expireSecond)) {
+            if (elapsedTime > TimeUnit.MINUTES.toMillis(expireMinute)) {
                 verificationDataStore.remove(request.getUsername());
                 return Response.status(Response.Status.BAD_REQUEST).entity("Verification code expired").build();
             }
@@ -83,6 +83,45 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
 
             // Code is valid
             verificationDataStore.remove(request.getUsername()); // Optionally remove after use
+            return Response.ok("success").build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+    
+    
+    @POST
+    @Path("verify-code-check")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response verifyCodeCheck(VerifyCodeRequest request) {
+        try {
+            KeycloakContext context = session.getContext();
+            RealmModel realm = context.getRealm();
+            UserModel user = session.users().getUserByEmail(realm, request.getUsername());
+
+            if (user == null) {
+                return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+            }
+
+            VerificationData verificationData = verificationDataStore.get(request.getUsername());
+
+            if (verificationData == null) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Verification code not found").build();
+            }
+
+            long currentTime = System.currentTimeMillis();
+            long elapsedTime = currentTime - verificationData.getTimestamp();
+
+            if (elapsedTime > TimeUnit.MINUTES.toMillis(expireMinute)) {
+                verificationDataStore.remove(request.getUsername());
+                return Response.status(Response.Status.BAD_REQUEST).entity("Verification code expired").build();
+            }
+
+            if (!verificationData.getCode().equals(request.getCode())) {
+                return Response.status(Response.Status.BAD_REQUEST).entity("Invalid code").build();
+            }
+
+            // Code is valid
             return Response.ok("success").build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
@@ -128,7 +167,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
         List<Object> subjAttr = ImmutableList.of(realmName);
         Map<String, Object> attributes = new HashMap<>();
         attributes.put("code", code);
-        attributes.put("ttl", 1000/expireSecond);
+        attributes.put("ttl", 3);
         FreeMarkerEmailTemplateProvider mailSender = new FreeMarkerEmailTemplateProvider(session);
         mailSender.setRealm(realm);
         mailSender.setUser(user);
