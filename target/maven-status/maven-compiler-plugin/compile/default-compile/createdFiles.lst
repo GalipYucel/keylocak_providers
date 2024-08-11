@@ -1,0 +1,11 @@
+keycloakverfiyapi\dto\UserDTO.class
+keycloakverfiyapi\EmailOTPAuthenticator.class
+keycloakverfiyapi\dto\VerifyCodeRequest.class
+keycloakverfiyapi\VerifyEmailByCode.class
+keycloakverfiyapi\EmailOTPAuthenticatorFactory.class
+keycloakverfiyapi\CustomVerifyMailActionFactory.class
+keycloakverfiyapi\CustomVerifyMailActionProvider.class
+keycloakverfiyapi\dto\VerificationData.class
+keycloakverfiyapi\CodeVerifyMailApiRealmResourceProvider.class
+keycloakverfiyapi\CodeVerifyMailRealmResourceProviderFactory.class
+keycloakverfiyapi\dto\SendMailCodeRequest.class

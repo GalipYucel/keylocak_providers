@@ -3,7 +3,9 @@ D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\Co
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\CustomVerifyMailActionFactory.java
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\CustomVerifyMailActionProvider.java
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\dto\SendMailCodeRequest.java
+D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\dto\UserDTO.java
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\dto\VerificationData.java
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\dto\VerifyCodeRequest.java
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\EmailOTPAuthenticator.java
 D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\EmailOTPAuthenticatorFactory.java
+D:\Project\Java\keycloak-email-opt-api-verify\src\main\java\keycloakverfiyapi\VerifyEmailByCode.java

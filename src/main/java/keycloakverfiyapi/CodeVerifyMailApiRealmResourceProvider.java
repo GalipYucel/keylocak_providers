@@ -15,16 +15,21 @@ import org.keycloak.models.KeycloakContext;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
+import org.keycloak.services.managers.AppAuthManager;
+import org.keycloak.services.managers.AuthenticationManager.AuthResult;
 import org.keycloak.services.resource.RealmResourceProvider;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Response;
 import keycloakverfiyapi.dto.SendMailCodeRequest;
+import keycloakverfiyapi.dto.UserDTO;
 import keycloakverfiyapi.dto.VerificationData;
 import keycloakverfiyapi.dto.VerifyCodeRequest;
 
@@ -55,6 +60,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyCode(VerifyCodeRequest request) {
         try {
+        	checkAuth();
             KeycloakContext context = session.getContext();
             RealmModel realm = context.getRealm();
             UserModel user = session.users().getUserByEmail(realm, request.getUsername());
@@ -83,7 +89,8 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
 
             // Code is valid
             verificationDataStore.remove(request.getUsername()); // Optionally remove after use
-            return Response.ok("success").build();
+            UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), user.getEmail());
+            return Response.ok(userDTO).build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
@@ -95,6 +102,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
     @Produces(MediaType.APPLICATION_JSON)
     public Response verifyCodeCheck(VerifyCodeRequest request) {
         try {
+        	checkAuth();
             KeycloakContext context = session.getContext();
             RealmModel realm = context.getRealm();
             UserModel user = session.users().getUserByEmail(realm, request.getUsername());
@@ -135,6 +143,7 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
     @Produces(MediaType.APPLICATION_JSON)
     public Response sendMailCode(SendMailCodeRequest request) {
         try {
+        	checkAuth();
             KeycloakContext context = session.getContext();
             RealmModel realm = context.getRealm();
             UserModel user = session.users().getUserByUsername(realm, request.getUsername());
@@ -160,6 +169,16 @@ public class CodeVerifyMailApiRealmResourceProvider implements RealmResourceProv
         Random random = new Random();
         int code = 100000 + random.nextInt(900000);
         return String.valueOf(code);
+    }
+    
+    private AuthResult checkAuth() {
+        AuthResult auth = new AppAuthManager.BearerTokenAuthenticator(session).authenticate();
+        if (auth == null) {
+            throw new NotAuthorizedException("Bearer");
+        } else if (auth.getToken().getIssuedFor() == null || !auth.getToken().getIssuedFor().equals("mega_announcement_service_account")) {
+            throw new ForbiddenException("Token is not properly issued for admin-cli");
+        }
+        return auth;
     }
 
 	private void sendEmail(RealmModel realm, UserModel user, String code,String mailHeader) throws EmailException {

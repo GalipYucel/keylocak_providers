@@ -19,6 +19,7 @@ public class EmailOTPAuthenticatorFactory implements AuthenticatorFactory {
   public static final String CONFIG_PROP_ALLOW_LOWERCASE = "allowLowercase";
   public static final String CONFIG_PROP_ALLOW_NUMBERS = "allowNumbers";
   public static final String CONFIG_PROP_MAX_RETRIES = "maxRetries";
+  public static final String CONFIG_PROP_HEADER_TEXT = "formotpeaderText";
 
   @Override
   public String getId() {
@@ -62,6 +63,7 @@ public class EmailOTPAuthenticatorFactory implements AuthenticatorFactory {
   @Override
   public List<ProviderConfigProperty> getConfigProperties() {
     return Arrays.asList(
+    	new ProviderConfigProperty(CONFIG_PROP_HEADER_TEXT, "Form Header Text", "", ProviderConfigProperty.STRING_TYPE, "Form Header Text"),
         new ProviderConfigProperty(CONFIG_PROP_SIMULATION, "Simulation mode", "In simulation mode, the email won't be sent, but printed to the server logs.", ProviderConfigProperty.BOOLEAN_TYPE, true),
         new ProviderConfigProperty(CONFIG_PROP_EMAIL_SUBJECT, "Email Subject", "The subject of the email that sent to the user.", ProviderConfigProperty.STRING_TYPE, "Temporary Authentication Code"),
         new ProviderConfigProperty(CONFIG_PROP_LENGTH, "Code length", "The number of digits of the generated code.", ProviderConfigProperty.STRING_TYPE, 6),
