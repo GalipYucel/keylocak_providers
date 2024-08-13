@@ -48,7 +48,7 @@ public class EmailOTPAuthenticator implements Authenticator {
 		            return;*/
 				context.challenge(context.form().setAttribute("realm", context.getRealm())
 						.setAttribute(FormHeaderText, headerText).createForm(TOTP_FORM));
-				;
+				return;
 			} 
 	
 			KeycloakSession session = context.getSession();
